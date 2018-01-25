@@ -314,6 +314,9 @@
       this.credentials = input.credentials
       if (!options.headers) {
         this.headers = new Headers(input.headers)
+        if (input._rawHeaders) {
+          this._rawHeaders = input._rawHeaders
+        }
       }
       this.method = input.method
       this.mode = input.mode
@@ -327,6 +330,19 @@
 
     this.credentials = options.credentials || this.credentials || 'omit'
     if (options.headers || !this.headers) {
+      var headers = options.headers
+      if (headers && !(headers instanceof Headers)) {
+        var rawHeaders
+        if (!Array.isArray(headers)) {
+          rawHeaders = []
+          Object.getOwnPropertyNames(headers).forEach(function(name) {
+            rawHeaders.push([name, headers[name]])
+          })
+        } else {
+          rawHeaders = headers
+        }
+        this._rawHeaders = rawHeaders
+      }
       this.headers = new Headers(options.headers)
     }
     this.method = normalizeMethod(options.method || this.method || 'GET')
@@ -455,9 +471,15 @@
         xhr.responseType = 'blob'
       }
 
-      request.headers.forEach(function(value, name) {
-        xhr.setRequestHeader(name, value)
-      })
+      if (request._rawHeaders) {
+        request._rawHeaders.forEach(function (headers) {
+          xhr.setRequestHeader(headers[0], headers[1])
+        })
+      } else {
+        request.headers.forEach(function(value, name) {
+          xhr.setRequestHeader(name, value)
+        })
+      }
 
       xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
     })
