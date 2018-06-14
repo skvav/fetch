@@ -451,8 +451,12 @@
         resolve(new Response(body, options))
       }
 
-      xhr.onerror = function() {
-        reject(new TypeError('Network request failed'))
+      xhr.onerror = function(e) {
+        var error = new TypeError('Network request failed')
+        if (e) {
+          error.cause = e
+        }
+        reject(error)
       }
 
       xhr.ontimeout = function() {
