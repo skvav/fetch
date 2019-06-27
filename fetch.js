@@ -471,7 +471,9 @@
         xhr.withCredentials = false
       }
 
-      if ('responseType' in xhr && support.blob) {
+      if (init && init.binaryResponse) {
+        xhr.responseType = 'arraybuffer'
+      } else if ('responseType' in xhr && support.blob) {
         xhr.responseType = 'blob'
       }
 
