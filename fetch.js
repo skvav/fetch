@@ -216,7 +216,7 @@
         this._bodyFormData = body
       } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
         this._bodyText = body.toString()
-      } else if (support.arrayBuffer && support.blob && isDataView(body)) {
+      } else if (support.arrayBuffer && isDataView(body)) {
         this._bodyArrayBuffer = bufferClone(body.buffer)
         // IE 10-11 can't handle a DataView body.
         this._bodyInit = new Blob([this._bodyArrayBuffer])
@@ -254,12 +254,15 @@
           return Promise.resolve(new Blob([this._bodyText]))
         }
       }
-
+    }
+    if (support.arrayBuffer) {
       this.arrayBuffer = function() {
         if (this._bodyArrayBuffer) {
           return consumed(this) || Promise.resolve(this._bodyArrayBuffer)
-        } else {
+        } else if (support.blob) {
           return this.blob().then(readBlobAsArrayBuffer)
+        } else {
+          throw new Error('could not read text body as ArrayBuffer')
         }
       }
     }
