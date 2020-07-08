@@ -8,10 +8,10 @@
   var support = {
     searchParams: 'URLSearchParams' in self,
     iterable: 'Symbol' in self && 'iterator' in Symbol,
-    blob: 'FileReader' in self && 'Blob' in self && (function() {
+    blob: 'Blob' in self && (function() {
       try {
-        new Blob()
-        return true
+        var blob = new Blob()
+        return (blob.arrayBuffer && blob.text) || 'FileReader' in self
       } catch(e) {
         return false
       }
@@ -168,6 +168,9 @@
   }
 
   function readBlobAsArrayBuffer(blob) {
+    if (blob.arrayBuffer) {
+      return blob.arrayBuffer()
+    }
     var reader = new FileReader()
     var promise = fileReaderReady(reader)
     reader.readAsArrayBuffer(blob)
@@ -175,6 +178,9 @@
   }
 
   function readBlobAsText(blob) {
+    if (blob.text) {
+      return blob.text()
+    }
     var reader = new FileReader()
     var promise = fileReaderReady(reader)
     reader.readAsText(blob)
