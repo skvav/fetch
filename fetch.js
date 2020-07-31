@@ -473,6 +473,7 @@
       }
 
       xhr.open(request.method, request.url, true)
+      xhr.redirect = init && init.redirect ? init.redirect : 'follow'
 
       if (request.credentials === 'include') {
         xhr.withCredentials = true
