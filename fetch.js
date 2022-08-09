@@ -333,6 +333,7 @@
         body = input._bodyInit
         input.bodyUsed = true
       }
+      this.pfx = input.pfx
     } else {
       this.url = String(input)
     }
@@ -357,6 +358,7 @@
     this.method = normalizeMethod(options.method || this.method || 'GET')
     this.mode = options.mode || this.mode || null
     this.referrer = null
+    this.pfx = options.pfx || null
 
     if ((this.method === 'GET' || this.method === 'HEAD') && body) {
       throw new TypeError('Body not allowed for GET or HEAD requests')
@@ -473,6 +475,7 @@
       }
 
       xhr.open(request.method, request.url, true)
+      xhr.pfx = request.pfx
       xhr.redirect = init && init.redirect ? init.redirect : 'follow'
 
       if (request.credentials === 'include') {
